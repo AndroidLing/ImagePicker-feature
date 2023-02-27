@@ -1,6 +1,5 @@
 package com.lzy.imagepicker;
 
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
@@ -75,6 +74,8 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.e(TAG, "onCreateLoader");
+        loadedListener.onImagesLoadStart();
         CursorLoader cursorLoader = null;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             mCurProjection = IMAGE_PROJECTION;
@@ -85,12 +86,17 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
             cursorLoader = new CursorLoader(activity, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mCurProjection, null, null, mCurProjection[6] + " DESC");
         if (id == LOADER_CATEGORY)
             cursorLoader = new CursorLoader(activity, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mCurProjection, mCurProjection[1] + " like '%" + args.getString("path") + "%'", null, mCurProjection[6] + " DESC");
-
         return cursorLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.e(TAG, "onLoadFinished");
+//        try {
+//            Thread.sleep(3000L);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         if (data == null || data.getCount() == 0) {
             return;
         }
@@ -169,15 +175,18 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
             imageFolders.add(0, allImagesFolder);
         }
         ImagePicker.getInstance().setImageFolders(imageFolders);
-        loadedListener.onImagesLoaded(imageFolders);
+        loadedListener.onImagesLoadFinish(imageFolders);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.e(TAG, "onLoaderReset");
         System.out.println("--------");
     }
 
     public interface OnImagesLoadedListener {
-        void onImagesLoaded(List<ImageFolder> imageFolders);
+        void onImagesLoadStart();
+
+        void onImagesLoadFinish(List<ImageFolder> imageFolders);
     }
 }

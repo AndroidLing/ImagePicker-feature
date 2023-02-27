@@ -20,4 +20,5 @@
     <string name="ip_need_to_del">Are you sure to delete this photo?</string>
     <string name="ip_cancel">Cancel</string>
     <string name="ip_str_confirm">Confirm</string>
+    <string name="ip_loading_">Loading...</string>
 </resources>

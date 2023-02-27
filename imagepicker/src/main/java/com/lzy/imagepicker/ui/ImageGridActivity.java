@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -24,6 +25,7 @@ import com.lzy.imagepicker.adapter.ImageRecyclerAdapter.OnImageItemClickListener
 import com.lzy.imagepicker.bean.ImageFolder;
 import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.util.Utils;
+import com.lzy.imagepicker.view.CircleProgress;
 import com.lzy.imagepicker.view.FolderPopUpWindow;
 import com.lzy.imagepicker.view.GridSpacingItemDecoration;
 import com.lzy.imagepicker.view.SuperCheckBox;
@@ -61,6 +63,8 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
     private RecyclerView mRecyclerView;
     private ImageRecyclerAdapter mRecyclerAdapter;
     private SuperCheckBox mCbOrigin;
+    private ViewGroup mFlLoading;
+    private CircleProgress mCircleProgress;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -97,7 +101,8 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler);
-
+        mFlLoading = findViewById(R.id.fl_loading);
+        mCircleProgress = findViewById(R.id.cp_loading_view);
         findViewById(R.id.btn_back).setOnClickListener(this);
         mBtnOk = (Button) findViewById(R.id.btn_ok);
         mBtnOk.setOnClickListener(this);
@@ -237,7 +242,19 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
     }
 
     @Override
-    public void onImagesLoaded(List<ImageFolder> imageFolders) {
+    public void onImagesLoadStart() {
+        mFlLoading.setVisibility(View.VISIBLE);
+        mFlLoading.post(new Runnable() {
+            @Override
+            public void run() {
+                mCircleProgress.show();
+            }
+        });
+
+    }
+
+    @Override
+    public void onImagesLoadFinish(List<ImageFolder> imageFolders) {
         this.mImageFolders = imageFolders;
         imagePicker.setImageFolders(imageFolders);
         if (imageFolders.size() == 0) {
@@ -252,6 +269,8 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
         }
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mImageFolderAdapter.refreshData(imageFolders);
+        mFlLoading.setVisibility(View.GONE);
+        mCircleProgress.hide();
     }
 
     @Override
