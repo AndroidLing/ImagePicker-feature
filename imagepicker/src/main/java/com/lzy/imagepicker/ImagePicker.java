@@ -278,7 +278,7 @@ public class ImagePicker {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
             activity.startActivityForResult(intent, requestCode);
         } else {
-            //todo..
+            InnerToaster.obj(activity).show(R.string.ip_unable_to_recall_camera_page);
         }
     }
 
